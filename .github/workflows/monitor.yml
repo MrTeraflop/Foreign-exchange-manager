@@ -1,0 +1,52 @@
+name: 英镑汇率监控
+
+on:
+  schedule:
+    # 北京时间 7:07～22:37，每 30 分钟一次（cron 用 UTC：北京时间 = UTC + 8）
+    - cron: "7,37 23 * * *"
+    - cron: "7,37 0-14 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "check = 立即检查一次（不受时段限制）；test = 只发一条测试推送"
+        type: choice
+        options:
+          - check
+          - test
+        default: test
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fx-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 检查汇率
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          ALERT_THRESHOLD: ${{ vars.ALERT_THRESHOLD }}
+          ALERT_STEP: ${{ vars.ALERT_STEP }}
+          FAIL_ALERT_COUNT: ${{ vars.FAIL_ALERT_COUNT }}
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'scheduled' }}
+        run: python3 monitor.py
+
+      - name: 保存状态
+        run: |
+          if [ -n "$(git status --porcelain state.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add state.json
+            git commit -m "更新监控状态"
+            git pull --rebase
+            git push
+          else
+            echo "状态没有变化"
+          fi
