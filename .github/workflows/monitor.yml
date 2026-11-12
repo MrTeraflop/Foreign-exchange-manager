@@ -2,9 +2,9 @@ name: 英镑汇率监控
 
 on:
   schedule:
-    # 北京时间 7:07～22:37，每 30 分钟一次（cron 用 UTC：北京时间 = UTC + 8）
-    - cron: "7,37 23 * * *"
-    - cron: "7,37 0-14 * * *"
+    # 北京时间 7:07～22:52，每 15 分钟一次（cron 用 UTC：北京时间 = UTC + 8）
+    - cron: "7,22,37,52 23 * * *"
+    - cron: "7,22,37,52 0-14 * * *"
   workflow_dispatch:
     inputs:
       mode:
