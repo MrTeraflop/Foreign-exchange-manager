@@ -1,9 +1,9 @@
 {
-  "alerted_index": 1,
+  "alerted_index": 2,
   "consecutive_failures": 0,
   "failure_alerted": false,
-  "last_price": "886.32",
-  "last_published": "2026-11-13 12:57:41",
+  "last_price": "885.99",
+  "last_published": "2026-11-13 13:55:14",
   "step": "2",
   "threshold": "890"
 }
